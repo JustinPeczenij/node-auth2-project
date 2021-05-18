@@ -3,7 +3,7 @@ const { JWT_TOKEN } = require('../secrets/index')
 
 function tokenBuilder(user) {
     const payload = {
-        sub: user.user_id,
+        subject: user.user_id,
         username: user.username,
         role_name: user.role_name
     };

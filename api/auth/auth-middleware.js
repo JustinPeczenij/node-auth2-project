@@ -1,11 +1,11 @@
 const jwt = require('jsonwebtoken')
-const { JWT_SECRET } = require("../secrets"); // use this secret!
+const { JWT_TOKEN } = require("../secrets"); // use this secret!
 const Users = require('../users/users-model')
 
 const restricted = (req, res, next) => {
   const token = req.headers.authorization
   if(token) {
-    jwt.verify(token, JWT_SECRET, (err, decoded) => {
+    jwt.verify(token, JWT_TOKEN, (err, decoded) => {
       if(err) next({ status: 401, message: 'Token invalid'})
       else {
         req.decodedJwt = decoded
@@ -13,7 +13,7 @@ const restricted = (req, res, next) => {
       }
     })
   } else {
-    next({ status: 401, message: 'Token invalid'})
+    next({ status: 401, message: 'Token required'})
   }
   /*
     If the user does not provide a token in the Authorization header:
@@ -33,7 +33,7 @@ const restricted = (req, res, next) => {
 }
 
 const only = role_name => (req, res, next) => {
-  if(req.decodedJwt.role === role_name) next()
+  if(req.decodedJwt.role_name === role_name) next()
   else next({ status: 403, message: 'This is not for you'})
   /*
     If the user does not provide a token in the Authorization header with a role_name
@@ -75,8 +75,8 @@ const validateRoleName = (req, res, next) => {
     next()
   } else if(role_name.trim() === 'admin') {
     next({ status: 422, message: 'Role name can not be admin'})
-  } else if(role_name.trim() > 32) {
-    next({ status: 422, message: 'Role name can not be longer than 32 chars'})
+  } else if(role_name.trim().length > 32) {
+    next({ status: 422, message: 'can not be longer than 32 chars'})
   } else {
     req.body.role_name = role_name.trim()
     next()
